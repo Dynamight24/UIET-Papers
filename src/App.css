@@ -225,11 +225,34 @@ body {
   .fun-footer a .qr-img {
     transition: transform 0.3s ease;
   }
+<<<<<<< HEAD
   .spin {
   animation: spin 1s linear infinite;
   display: inline-block;
 }
 
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+=======
+
+  .spinner {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px; /* space between icon and text */
+  }
+  
+  .spinner svg {
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
