@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import "./App.css";
 import { AiOutlineEye } from "react-icons/ai";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://pyq-backend-yzz5.onrender.com";
 
@@ -13,7 +14,8 @@ export default function App() {
     examType: "",
   });
   const [papers, setPapers] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [uploadLoading, setUploadLoading] = useState(false);
   const [file, setFile] = useState(null);
   const [meta, setMeta] = useState({
     title: "",
@@ -37,13 +39,13 @@ export default function App() {
 
   const load = async () => {
     try {
-      setLoading(true);
+      setSearchLoading(true);
       const res = await fetch(`${BACKEND_URL}/api/papers?${query}`);
       setPapers(await res.json());
     } catch (e) {
       console.error(e);
     } finally {
-      setLoading(false);
+      setSearchLoading(false);
     }
   };
 
@@ -65,16 +67,11 @@ export default function App() {
     }
 
     try {
+      setUploadLoading(true);
+
       const form = new FormData();
-      const metaPayload = {
-        ...meta,
-        year: Number(meta.year),
-        semester: Number(meta.semester),
-      };
-      form.append(
-        "meta",
-        new Blob([JSON.stringify(metaPayload)], { type: "application/json" })
-      );
+      const metaPayload = { ...meta, year: Number(meta.year), semester: Number(meta.semester) };
+      form.append("meta", new Blob([JSON.stringify(metaPayload)], { type: "application/json" }));
       form.append("file", file);
 
       const res = await fetch(`${BACKEND_URL}/api/upload`, {
@@ -88,6 +85,8 @@ export default function App() {
       load();
     } catch (err) {
       setMessage("Upload error: " + err.message);
+    } finally {
+      setUploadLoading(false);
     }
   };
 
@@ -154,8 +153,8 @@ export default function App() {
             <option value="MIDSEM">MIDSEM</option>
             <option value="ENDSEM">ENDSEM</option>
           </select>
-          <button type="submit" className="search-btn">
-            Search
+          <button type="submit" className="search-btn" disabled={searchLoading}>
+            {searchLoading ? <AiOutlineLoading3Quarters className="spin" /> : "Search"}
           </button>
         </form>
       </section>
@@ -235,9 +234,9 @@ export default function App() {
           <button
             type="submit"
             className="upload-btn"
-            disabled={file && file.size > 5 * 1024 * 1024}
+            disabled={uploadLoading || (file && file.size > 5 * 1024 * 1024)}
           >
-            Upload
+            {uploadLoading ? <AiOutlineLoading3Quarters className="spin" /> : "Upload"}
           </button>
           <div
             className={`form-message ${
@@ -252,7 +251,7 @@ export default function App() {
       {/* Results Section */}
       <section className="section-card table-wrapper">
         <h2>Results ({papers.length})</h2>
-        {loading ? (
+        {searchLoading ? (
           <p>Loading...</p>
         ) : papers.length === 0 ? (
           <p>No papers to display. Use search to load papers.</p>
@@ -292,12 +291,16 @@ export default function App() {
 
       {/* Fun Footer */}
       <div className="fun-footer">
-  <span>Liked my project? Buy me GTA 6! 🎮</span>
-  <a href="https://drive.google.com/file/d/1qsvJ1ymNztSjLyhSjmM3rcK-Yf4akoqe/view?usp=drive_link" target="_blank" rel="noreferrer">
-    <img src="/qr.png" alt="" className="qr-img" />
-  </a>
-</div>
-
+        <span>Liked my project? Buy me GTA 6! 🎮</span>
+        <a
+          href="https://drive.google.com/file/d/1qsvJ1ymNztSjLyhSjmM3rcK-Yf4akoqe/view?usp=drive_link"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <img src="/qr.png" alt="" className="qr-img" />
+        </a>
+      </div>
     </div>
   );
 }
+
