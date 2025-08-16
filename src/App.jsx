@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from "react";
 import "./App.css";
-import { AiOutlineEye } from "react-icons/ai";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { AiOutlineEye, AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://pyq-backend-yzz5.onrender.com";
 
@@ -154,7 +153,14 @@ export default function App() {
             <option value="ENDSEM">ENDSEM</option>
           </select>
           <button type="submit" className="search-btn" disabled={searchLoading}>
-            {searchLoading ? <AiOutlineLoading3Quarters className="spin" /> : "Search"}
+            {searchLoading ? (
+              <span className="spinner">
+                <AiOutlineLoading3Quarters size={18} />
+                Searching...
+              </span>
+            ) : (
+              "Search"
+            )}
           </button>
         </form>
       </section>
@@ -236,7 +242,14 @@ export default function App() {
             className="upload-btn"
             disabled={uploadLoading || (file && file.size > 5 * 1024 * 1024)}
           >
-            {uploadLoading ? <AiOutlineLoading3Quarters className="spin" /> : "Upload"}
+            {uploadLoading ? (
+              <span className="spinner">
+                <AiOutlineLoading3Quarters size={18} />
+                Uploading...
+              </span>
+            ) : (
+              "Upload"
+            )}
           </button>
           <div
             className={`form-message ${
@@ -303,4 +316,5 @@ export default function App() {
     </div>
   );
 }
+
 
