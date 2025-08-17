@@ -300,19 +300,7 @@ export default function App() {
             </tbody>
           </table>
         )}
-      </section>
-
-      {/* Fun Footer */}
-      <div className="fun-footer">
-        <span>Liked my project? Buy me GTA 6! 🎮</span>
-        <a
-          href="https://drive.google.com/file/d/1qsvJ1ymNztSjLyhSjmM3rcK-Yf4akoqe/view?usp=drive_link"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <img src="/qr.png" alt="" className="qr-img" />
-        </a>
-      </div>
+      </section>  
     </div>
   );
 }
