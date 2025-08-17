@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import "./App.css";
 import { AiOutlineEye, AiOutlineLoading3Quarters } from "react-icons/ai";
 
@@ -36,6 +36,7 @@ export default function App() {
     return params.toString();
   }, [filters]);
 
+  // Load approved papers
   const load = async () => {
     try {
       setSearchLoading(true);
@@ -47,6 +48,10 @@ export default function App() {
       setSearchLoading(false);
     }
   };
+
+  useEffect(() => {
+    load();
+  }, []);
 
   const onSearch = (e) => {
     e.preventDefault();
@@ -72,18 +77,21 @@ export default function App() {
       const metaPayload = { ...meta, year: Number(meta.year), semester: Number(meta.semester) };
       form.append("meta", new Blob([JSON.stringify(metaPayload)], { type: "application/json" }));
       form.append("file", file);
+      
 
       const res = await fetch(`${BACKEND_URL}/api/upload`, {
         method: "POST",
         body: form,
       });
-      if (!res.ok) throw new Error("Upload failed");
 
-      setMessage("Uploaded ✔");
+      if (!res.ok) throw new Error("Upload failed : Hey buddy Please upload a UIET exam paper, no random stuff allowed, Limited storage :( ");
+
+      setMessage("Upload successful ✔");
       setFile(null);
-      load();
+      setMeta({ title: "", branch: "", subject: "", year: "", semester: "", examType: "" });
+      load(); // Refresh list
     } catch (err) {
-      setMessage("Upload error: " + err.message);
+      setMessage( err.message);
     } finally {
       setUploadLoading(false);
     }
@@ -106,61 +114,36 @@ export default function App() {
       <section className="section-card">
         <h2>Search Papers</h2>
         <form onSubmit={onSearch} className="grid-form">
-          <select
-            value={filters.branch}
-            onChange={(e) =>
-              setFilters((f) => ({ ...f, branch: e.target.value }))
-            }
-          >
+          <select value={filters.branch} onChange={(e) => setFilters((f) => ({ ...f, branch: e.target.value }))}>
             <option value="">Branch</option>
             {branches.map((b) => (
-              <option key={b} value={b}>
-                {b}
-              </option>
+              <option key={b} value={b}>{b}</option>
             ))}
           </select>
           <input
             placeholder="Subject"
             value={filters.subject}
-            onChange={(e) =>
-              setFilters((f) => ({ ...f, subject: e.target.value }))
-            }
+            onChange={(e) => setFilters((f) => ({ ...f, subject: e.target.value }))}
           />
           <input
             placeholder="Year"
             type="number"
             value={filters.year}
-            onChange={(e) =>
-              setFilters((f) => ({ ...f, year: e.target.value }))
-            }
+            onChange={(e) => setFilters((f) => ({ ...f, year: e.target.value }))}
           />
           <input
             placeholder="Semester"
             type="number"
             value={filters.semester}
-            onChange={(e) =>
-              setFilters((f) => ({ ...f, semester: e.target.value }))
-            }
+            onChange={(e) => setFilters((f) => ({ ...f, semester: e.target.value }))}
           />
-          <select
-            value={filters.examType}
-            onChange={(e) =>
-              setFilters((f) => ({ ...f, examType: e.target.value }))
-            }
-          >
+          <select value={filters.examType} onChange={(e) => setFilters((f) => ({ ...f, examType: e.target.value }))}>
             <option value="">Exam Type</option>
             <option value="MIDSEM">MIDSEM</option>
             <option value="ENDSEM">ENDSEM</option>
           </select>
           <button type="submit" className="search-btn" disabled={searchLoading}>
-            {searchLoading ? (
-              <span className="spinner">
-                <AiOutlineLoading3Quarters size={18} />
-                Searching...
-              </span>
-            ) : (
-              "Search"
-            )}
+            {searchLoading ? <span className="spinner"><AiOutlineLoading3Quarters size={18} /> Searching...</span> : "Search"}
           </button>
         </form>
       </section>
@@ -182,17 +165,13 @@ export default function App() {
           >
             <option value="">Branch</option>
             {branches.map((b) => (
-              <option key={b} value={b}>
-                {b}
-              </option>
+              <option key={b} value={b}>{b}</option>
             ))}
           </select>
           <input
             placeholder="Subject"
             value={meta.subject}
-            onChange={(e) =>
-              setMeta((m) => ({ ...m, subject: e.target.value }))
-            }
+            onChange={(e) => setMeta((m) => ({ ...m, subject: e.target.value }))}
             required
           />
           <input
@@ -206,16 +185,12 @@ export default function App() {
             placeholder="Semester"
             type="number"
             value={meta.semester}
-            onChange={(e) =>
-              setMeta((m) => ({ ...m, semester: e.target.value }))
-            }
+            onChange={(e) => setMeta((m) => ({ ...m, semester: e.target.value }))}
             required
           />
           <select
             value={meta.examType}
-            onChange={(e) =>
-              setMeta((m) => ({ ...m, examType: e.target.value }))
-            }
+            onChange={(e) => setMeta((m) => ({ ...m, examType: e.target.value }))}
           >
             <option value="">Exam Type</option>
             <option value="MIDSEM">MIDSEM</option>
@@ -229,10 +204,7 @@ export default function App() {
               setFile(selected);
               if (selected) {
                 const sizeMB = (selected.size / (1024 * 1024)).toFixed(2);
-                if (sizeMB > 5)
-                  setMessage(
-                    `File too large (${sizeMB} MB). Max 5 MB. Please compress it.`
-                  );
+                if (sizeMB > 5) setMessage(`File too large (${sizeMB} MB). Max 5 MB. Please compress it.`);
                 else setMessage(`Selected file: ${selected.name} (${sizeMB} MB)`);
               } else setMessage("");
             }}
@@ -242,22 +214,9 @@ export default function App() {
             className="upload-btn"
             disabled={uploadLoading || (file && file.size > 5 * 1024 * 1024)}
           >
-            {uploadLoading ? (
-              <span className="spinner">
-                <AiOutlineLoading3Quarters size={18} />
-                Uploading...
-              </span>
-            ) : (
-              "Upload"
-            )}
+            {uploadLoading ? <span className="spinner"><AiOutlineLoading3Quarters size={18} /> Uploading...</span> : "Upload"}
           </button>
-          <div
-            className={`form-message ${
-              file && file.size > 5 * 1024 * 1024 ? "error" : ""
-            }`}
-          >
-            {message}
-          </div>
+          <div className={`form-message ${file && file.size > 5 * 1024 * 1024 ? "error" : ""}`}>{message}</div>
         </form>
       </section>
 
@@ -300,9 +259,19 @@ export default function App() {
             </tbody>
           </table>
         )}
-      </section>  
+      </section>
+
+      {/* Fun Footer */}
+      <div className="fun-footer">
+        <span>Liked my project? Buy me GTA 6! 🎮</span>
+        <a
+          href="https://drive.google.com/file/d/1qsvJ1ymNztSjLyhSjmM3rcK-Yf4akoqe/view?usp=drive_link"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <img src="/qr.png" alt="" className="qr-img" />
+        </a>
+      </div>
     </div>
   );
 }
-
-
