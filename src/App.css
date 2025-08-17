@@ -257,3 +257,40 @@ body {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+@media (max-width: 480px) {
+  .grid-form {
+    grid-template-columns: 1fr;
+  }
+
+  .grid-form input,
+  .grid-form select,
+  .grid-form button {
+    width: 100%;
+  }
+
+  .table-wrapper table {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .description {
+    font-size: 0.95rem;
+    padding: 12px;
+  }
+
+  .section-card {
+    padding: 15px 12px;
+  }
+}
+
+/* Spinner animation */
+.spinner svg {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
