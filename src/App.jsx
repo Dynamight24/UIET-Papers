@@ -107,6 +107,7 @@ export default function App() {
           I've tried to make finding previous years' question papers during exam season a lot easier for you.🫰🏻
           <br />
           To make this a useful resource for yourself and upcoming UIETians, please contribute by adding papers with the correct title, branch, year, and a proper description.♥️ 📚
+          (Due to server limitation, the web application works a little slow.... working on optimising it :)).
         </p>
       </section>
 
